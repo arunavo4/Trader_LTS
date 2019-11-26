@@ -11,7 +11,7 @@ from ray.rllib.agents.dqn.dqn import DQNTrainer
 from ray.rllib.models import ModelCatalog
 from ray.rllib.utils import try_import_tf
 
-from lib.env.TraderRenkoEnv_v2_lite import StockTradingEnv
+from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
@@ -21,7 +21,6 @@ ModelCatalog.register_custom_model("NatureCNN", VisionNetwork)
 
 # restore = '/home/skywalker/ray_results/DQN/DQN_StockTradingEnv_2f8c5cc4_2019-11-12_23-08-06i2in8uwu/checkpoint_600',
 # resume = True,
-# max_failures = 10,
 
 # SINGLE WORKER
 # ray.init(memory=10000000000,

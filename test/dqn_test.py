@@ -20,7 +20,7 @@ from ray.rllib.policy.sample_batch import DEFAULT_POLICY_ID
 from ray.rllib.utils import try_import_tf
 from ray.tune.util import merge_dicts
 
-from lib.env.TraderRenkoEnv_v2_lite import StockTradingEnv
+from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
@@ -173,10 +173,10 @@ def rollout(agent, env_name, num_steps, out=None, no_render=True):
 
 if __name__ == "__main__":
     args = {
-        'checkpoint_dir': '/home/skywalker/backup/DQN/DQN_StockTradingEnv_0_2019-11-18_10-10-36yse8__u8'
-                          '/checkpoint_1600',
-        'checkpoint_path': '/home/skywalker/backup/DQN/DQN_StockTradingEnv_0_2019-11-18_10-10-36yse8__u8'
-                           '/checkpoint_1600/checkpoint-1600',
+        'checkpoint_dir': '/home/skywalker/ray_results/DQN/DQN_StockTradingEnv_0_2019-11-20_09-40-394e6195bw'
+                          '/checkpoint_1800',
+        'checkpoint_path': '/home/skywalker/ray_results/DQN/DQN_StockTradingEnv_0_2019-11-20_09-40-394e6195bw'
+                           '/checkpoint_1800/checkpoint-1800',
         'config': {"env_config": {
             "enable_env_logging": True,
             "look_back_window_size": 375 * 10,

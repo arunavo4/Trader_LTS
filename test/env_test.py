@@ -5,7 +5,7 @@ import cv2
 import gym
 import time
 from statistics import mean
-from lib.env.TraderRenkoEnv_v2_lite import StockTradingEnv
+from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
 import pandas as pd
 import numpy as np
 
@@ -26,21 +26,21 @@ time_obs = []
 
 frames = []
 
-while True:
+for i in range(20):
     # env.render()
     action = env.action_space.sample()  # your agent here (this takes random actions)
 
     # frames.append(Image.fromarray(observation[-1]))
-    # path = '../output/'
-    # #
-    # img = Image.fromarray(observation[-1])
-    # img.save(path + str(env.current_step) + '.png')
+    path = '../output/'
+    #
+    img = Image.fromarray(observation[:, :, -1])
+    img.save(path + str(env.current_step) + '.png')
 
     # env.plot_renko(path=path)
 
     start = time.time()
     observation, reward, done, info = env.step(action)
-    # print(len(observation), observation[1].shape)
+    print(len(observation), observation.shape)
     end = time.time()
 
     time_obs.append(end - start)
@@ -66,5 +66,5 @@ env.close()
 
 print("Avg Response Time: ", mean(time_obs))
 print("Theoretical Traversal Time: {} Min".format((mean(time_obs) * max_env_steps) / 60))
-print("Total days",len(env.daily_profit_per))
+print("Total days", len(env.daily_profit_per))
 print(len(time_obs))

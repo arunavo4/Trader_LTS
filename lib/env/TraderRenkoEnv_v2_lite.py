@@ -392,7 +392,7 @@ class StockTradingEnv(gym.Env):
 
                 avg_profit = profits / len(self.positions)
                 profit_percent = (avg_profit / mean(self.positions)) * 100
-                reward += self.getReward(profit_percent)
+                reward += self.getReward(profit_percent) * 0.01
                 message = "{}: Action: {} ; Reward: {}".format(self._current_timestamp(), "Hold",
                                                                round(reward, 3))
                 self.action_record = message

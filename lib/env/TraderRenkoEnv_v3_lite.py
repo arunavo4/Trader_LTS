@@ -241,7 +241,7 @@ class StockTradingEnv(gym.Env):
 
         spread_of_i = max(values_of_i) - min(values_of_i)
 
-        dist_btw_min_i = init_i - min(values_of_i)
+        dist_btw_min_i = init_i - min(values_of_i) if min(values_of_i) > 0 else init_i - (min(values_of_i) + 1)
 
         i = int((color_graph.shape[0] - spread_of_i) / 2) + dist_btw_min_i
         color_graph[i, 0] = fill_color[1] if renko_graph_directions[0] == 1 else fill_color[0]

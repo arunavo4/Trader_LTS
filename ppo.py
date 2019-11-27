@@ -10,7 +10,7 @@ from ray.rllib.models.tf.visionnet_v2 import VisionNetwork
 from ray.rllib.utils import try_import_tf
 from ray.tune import grid_search
 
-from lib.env.TraderRenkoEnv import StockTradingEnv
+from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
 
 tf = try_import_tf()
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
             },
             "vf_share_layers": True,
             "vf_loss_coeff": grid_search([0.5, 1]),
-            "vf_clip_param": 1000.0,
+            "vf_clip_param": 10.0,
             "lr": grid_search([1e-2, 1e-4, 1e-6]),  # try different lrs
             "num_workers": 4,  # parallelism
             "num_gpus": 1,

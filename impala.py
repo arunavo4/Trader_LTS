@@ -32,7 +32,6 @@ tune.run(ImpalaTrainer,
                  "sample_batch_size": 50,
                  "train_batch_size": 500,
                  "num_gpus": 1,
-                 "num_cpus_per_worker": 2,
                  "num_workers": 4,
                  "num_envs_per_worker": 2,
                  "lr_schedule": [

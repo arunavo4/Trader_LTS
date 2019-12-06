@@ -22,18 +22,6 @@ ModelCatalog.register_custom_model("NatureCNN", VisionNetwork)
 # restore = '/home/skywalker/ray_results/DQN/DQN_StockTradingEnv_2f8c5cc4_2019-11-12_23-08-06i2in8uwu/checkpoint_600',
 # resume = True,
 
-# SINGLE WORKER
-# ray.init(memory=10000000000,
-#          object_store_memory=5000000000,
-#          redis_max_memory=2000000000,
-#          driver_object_store_memory=1000000000)
-
-# 4 WORKERS
-ray.init(memory=20000000000,
-         object_store_memory=10000000000,
-         redis_max_memory=5000000000,
-         driver_object_store_memory=2000000000)
-
 tune.run(DQNTrainer,
          max_failures=10,
          checkpoint_freq=10,  # iterations

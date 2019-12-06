@@ -16,11 +16,6 @@ tf = try_import_tf()
 # register_env("StockTradingEnv", lambda _: StockTradingEnv(10))
 ModelCatalog.register_custom_model("NatureCNN", VisionNetwork)
 
-ray.init(memory=20000000000,
-         object_store_memory=10000000000,
-         redis_max_memory=5000000000,
-         driver_object_store_memory=2000000000)
-
 tune.run(ApexTrainer,
          max_failures=10,
          checkpoint_freq=10,  # iterations
@@ -31,7 +26,6 @@ tune.run(ApexTrainer,
                  },
                  "double_q": False,
                  "dueling": False,
-                 "num_atoms": 1,
                  "noisy": False,
                  "lr": .0001,
                  "adam_epsilon": .00015,

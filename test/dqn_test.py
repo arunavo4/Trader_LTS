@@ -173,10 +173,10 @@ def rollout(agent, env_name, num_steps, out=None, no_render=True):
 
 if __name__ == "__main__":
     args = {
-        'checkpoint_dir': '/home/skywalker/ray_results/DQN/DQN_StockTradingEnv_0_2019-11-20_09-40-394e6195bw'
-                          '/checkpoint_1800',
-        'checkpoint_path': '/home/skywalker/ray_results/DQN/DQN_StockTradingEnv_0_2019-11-20_09-40-394e6195bw'
-                           '/checkpoint_1800/checkpoint-1800',
+        'checkpoint_dir': '/home/skywalker/ray_results/IMPALA/IMPALA_StockTradingEnv_0_2019-12-01_16-39-18eykevn_g'
+                          '/checkpoint_1720',
+        'checkpoint_path': '/home/skywalker/ray_results/IMPALA/IMPALA_StockTradingEnv_0_2019-12-01_16-39-18eykevn_g'
+                           '/checkpoint_1720/checkpoint-1720',
         'config': {"env_config": {
             "enable_env_logging": True,
             "look_back_window_size": 375 * 10,
@@ -184,7 +184,7 @@ if __name__ == "__main__":
             "frame_stack_size": 4,
         }},
         'env': StockTradingEnv,
-        'run': 'DQN',
+        'run': "IMPALA",
         'steps': 10000,
         'out': None,
         'no_render': True

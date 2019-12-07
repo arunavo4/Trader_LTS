@@ -10,7 +10,7 @@ import logging
 import math
 from collections import deque
 from statistics import mean
-
+import random as rand
 import cv2
 import gym
 import numpy as np
@@ -65,7 +65,8 @@ class StockTradingEnv(gym.Env):
 
         self.initial_balance = 10000
 
-        self.exchange = FBMExchange()
+        # self.exchange = rand.choices([FBMExchange(), StaticExchange()], [0.6, 0.4])
+        self.exchange = StaticExchange()
 
         self.enable_logging = config['enable_env_logging']
         if self.enable_logging:
@@ -263,7 +264,7 @@ class StockTradingEnv(gym.Env):
         while True:
             observations = self.exchange.data_frame.iloc[self.current_step]
             new_renko_bars = self.do_next(pd.Series([observations['close']]))
-            if new_renko_bars == 0:
+            if new_renko_bars == 0 and self.market_open:
                 if self.current_step + 1 <= len(self.exchange.data_frame) - 1:
                     self.current_step += 1
                     # Automatically perform hold

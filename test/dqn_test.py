@@ -182,6 +182,7 @@ if __name__ == "__main__":
             "look_back_window_size": 375 * 10,
             "observation_window": 84,
             "frame_stack_size": 4,
+            "use_leverage": True,
         }},
         'env': StockTradingEnv,
         'run': "IMPALA",

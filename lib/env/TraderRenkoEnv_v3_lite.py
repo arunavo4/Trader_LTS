@@ -79,6 +79,13 @@ class StockTradingEnv(gym.Env):
         self.renko_directions = []
         self.brick_size = 10.0
 
+        # Leverage
+        self.leverage = 1
+        self.use_leverage = config['use_leverage']
+
+        if self.use_leverage:
+            self.leverage = 15
+
         # Stuff from the Env Before
         self.decay_rate = 1e-2
         self.done = False
@@ -217,7 +224,7 @@ class StockTradingEnv(gym.Env):
         return self.sum / self.denominator
 
     def set_qty(self, price):
-        self.qty = int(self.balance / price)
+        self.qty = int((self.balance * self.leverage) / price)
 
         if self.qty == 0:
             self.done = True
@@ -351,13 +358,15 @@ class StockTradingEnv(gym.Env):
             else:
                 # exit from Short Sell
                 profits = 0
-                profits += cal_profit_w_brokerage(float(current_price), mean(self.positions),
-                                                  self.qty)
+                profits += cal_profit_w_brokerage(float(current_price), mean(self.positions), self.qty)
 
                 avg_profit = profits / self.qty
                 profit_percent = (avg_profit / mean(self.positions)) * 100
                 self.amt += self.amt * (profit_percent / 100)
-                self.balance = self.amt
+                if self.use_leverage:
+                    self.balance = self.amt + profits
+                else:
+                    self.balance = self.amt
                 if profit_percent > 0.0:
                     self.wins += 1
                 else:
@@ -398,7 +407,7 @@ class StockTradingEnv(gym.Env):
 
                 avg_profit = profits / len(self.positions)
                 profit_percent = (avg_profit / mean(self.positions)) * 100
-                # reward += self.getReward(profit_percent) * 0.01
+                # reward += self.getReward(profit_percent) * 0.001
                 message = "{}: Action: {} ; Reward: {}".format(self._current_timestamp(), "Hold",
                                                                round(reward, 3))
                 self.action_record = message
@@ -442,7 +451,11 @@ class StockTradingEnv(gym.Env):
                 avg_profit = profits / self.qty
                 profit_percent = (avg_profit / mean(self.positions)) * 100
                 self.amt += self.amt * (profit_percent / 100)
-                self.balance = self.amt
+                if self.use_leverage:
+                    self.balance = self.amt + profits
+                else:
+                    self.balance = self.amt
+
                 if profit_percent > 0.0:
                     self.wins += 1
                 else:
@@ -481,7 +494,7 @@ class StockTradingEnv(gym.Env):
         if (self.t + 1) % 375 == 0:
             self.market_open = True
             self.tradable = True
-            # reward += self.profit_per * 1000  # Bonus for making a profit at the end of the day
+            # reward += self.profit_per * 10  # Bonus for making a profit at the end of the day
             self.daily_profit_per.append(round(self.profit_per, 3))
             self.profit_per = 0.0
             # Reset Profits for the day

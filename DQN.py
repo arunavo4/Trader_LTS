@@ -55,6 +55,7 @@ tune.run(DQNTrainer,
                      "look_back_window_size": 375 * 10,
                      "observation_window": 84,
                      "frame_stack_size": 4,
+                     "use_leverage": False,
                  },
                  })  # "eager": True for eager execution
 # "num_workers": 4,

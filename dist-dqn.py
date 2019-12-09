@@ -10,7 +10,7 @@ from ray.rllib.models.tf.visionnet_v1 import _get_filter_config
 from ray.rllib.models.tf.misc import normc_initializer, get_activation_fn
 from ray.rllib.utils import try_import_tf
 
-from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
+from lib.env.IndianStockEnv import IndianStockEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
@@ -21,7 +21,7 @@ ModelCatalog.register_custom_model("NatureCNN", VisionNetwork)
 tune.run(DQNTrainer,
          checkpoint_freq=10,  # iterations
          checkpoint_at_end=True,
-         config={"env": StockTradingEnv,
+         config={"env": IndianStockEnv,
                  "model": {
                      "custom_model": "NatureCNN"
                  },
@@ -47,6 +47,7 @@ tune.run(DQNTrainer,
                  "target_network_update_freq": 8000,
                  "timesteps_per_iteration": 10000,
                  "env_config": {
+                     "initial_balance": 10000,
                      "enable_env_logging": False,
                      "look_back_window_size": 375 * 10,
                      "observation_window": 84,

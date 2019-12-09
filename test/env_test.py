@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 
 env_config = {
+    "initial_balance": 10000,
     "enable_env_logging": True,
     "look_back_window_size": 375 * 10,
     "observation_window": 84,

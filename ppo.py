@@ -10,7 +10,7 @@ from ray.rllib.models.tf.visionnet_v2 import VisionNetwork
 from ray.rllib.utils import try_import_tf
 from ray.tune import grid_search
 
-from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
+from lib.env.IndianStockEnv import IndianStockEnv
 
 tf = try_import_tf()
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
             "timesteps_total": 10000000,
         },
         config={
-            "env": StockTradingEnv,  # or "corridor" if registered above
+            "env": IndianStockEnv,  # or "corridor" if registered above
             "model": {
                 "custom_model": "my_model",
             },
@@ -37,6 +37,7 @@ if __name__ == "__main__":
             "num_workers": 4,  # parallelism
             "num_gpus": 1,
             "env_config": {
+                "initial_balance": 10000,
                 "enable_env_logging": False,
                 "look_back_window_size": 375 * 10,
                 "observation_window": 84,

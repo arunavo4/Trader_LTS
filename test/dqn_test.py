@@ -20,7 +20,7 @@ from ray.rllib.policy.sample_batch import DEFAULT_POLICY_ID
 from ray.rllib.utils import try_import_tf
 from ray.tune.util import merge_dicts
 
-from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
+from lib.env.IndianStockEnv import IndianStockEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
@@ -178,15 +178,16 @@ if __name__ == "__main__":
         'checkpoint_path': '/home/skywalker/ray_results/IMPALA/IMPALA_StockTradingEnv_0_2019-12-01_16-39-18eykevn_g'
                            '/checkpoint_1720/checkpoint-1720',
         'config': {"env_config": {
+            "initial_balance": 10000,
             "enable_env_logging": True,
             "look_back_window_size": 375 * 10,
             "observation_window": 84,
             "frame_stack_size": 4,
-            "use_leverage": True,
+            "use_leverage": False,
         }},
-        'env': StockTradingEnv,
+        'env': IndianStockEnv,
         'run': "IMPALA",
-        'steps': 10000,
+        'steps': 5000,
         'out': None,
         'no_render': True
     }

@@ -11,7 +11,7 @@ from ray.rllib.agents.dqn.dqn import DQNTrainer
 from ray.rllib.models import ModelCatalog
 from ray.rllib.utils import try_import_tf
 
-from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
+from lib.env.IndianStockEnv import IndianStockEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
@@ -26,7 +26,7 @@ tune.run(DQNTrainer,
          max_failures=10,
          checkpoint_freq=10,  # iterations
          checkpoint_at_end=True,
-         config={"env": StockTradingEnv,
+         config={"env": IndianStockEnv,
                  "num_atoms": 51,
                  "noisy": True,
                  "gamma": 0.99,
@@ -51,6 +51,7 @@ tune.run(DQNTrainer,
                      "custom_model": "NatureCNN"
                  },
                  "env_config": {
+                     "initial_balance": 10000,
                      "enable_env_logging": False,
                      "look_back_window_size": 375 * 10,
                      "observation_window": 84,

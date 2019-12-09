@@ -362,11 +362,7 @@ class StockTradingEnv(gym.Env):
 
                 avg_profit = profits / self.qty
                 profit_percent = (avg_profit / mean(self.positions)) * 100
-                self.amt += self.amt * (profit_percent / 100)
-                if self.use_leverage:
-                    self.balance = self.amt + profits
-                else:
-                    self.balance = self.amt
+                self.balance += (self.amt + profits)
                 if profit_percent > 0.0:
                     self.wins += 1
                 else:
@@ -450,11 +446,7 @@ class StockTradingEnv(gym.Env):
 
                 avg_profit = profits / self.qty
                 profit_percent = (avg_profit / mean(self.positions)) * 100
-                self.amt += self.amt * (profit_percent / 100)
-                if self.use_leverage:
-                    self.balance = self.amt + profits
-                else:
-                    self.balance = self.amt
+                self.balance += (self.amt + profits)
 
                 if profit_percent > 0.0:
                     self.wins += 1
@@ -494,6 +486,16 @@ class StockTradingEnv(gym.Env):
         if (self.t + 1) % 375 == 0:
             self.market_open = True
             self.tradable = True
+            # Log for the day
+            if self.enable_logging:
+                self.logger.info(
+                    "{}: {} Net_worth: {} Total Profits: {} Total Profit_Per: {}".format(
+                        self._current_timestamp(),
+                        ((self.t + 1) % 375),
+                        round(self.net_worths[-1], 2),
+                        round(self.profits, 2),
+                        round(self.profit_per, 3), ))
+            
             # reward += self.profit_per * 10  # Bonus for making a profit at the end of the day
             self.daily_profit_per.append(round(self.profit_per, 3))
             self.profit_per = 0.0
@@ -510,9 +512,10 @@ class StockTradingEnv(gym.Env):
         if self.market_open:
             if self.enable_logging:
                 self.logger.info(
-                    "{}: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
+                    "{}: {} Balance: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
                         self._current_timestamp(),
                         ((self.t + 1) % 375),
+                        round(self.balance,2),
                         round(self.net_worths[-1], 2),
                         round(self.qty),
                         round(self.position_value, 2),

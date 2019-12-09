@@ -10,10 +10,11 @@ import pandas as pd
 import numpy as np
 
 env_config = {
-    "enable_env_logging": False,
+    "enable_env_logging": True,
     "look_back_window_size": 375 * 10,
     "observation_window": 84,
     "frame_stack_size": 4,
+    "use_leverage": False,
 }
 
 env = StockTradingEnv(env_config)
@@ -26,21 +27,21 @@ time_obs = []
 
 frames = []
 
-for i in range(20):
+while True:
     # env.render()
     action = env.action_space.sample()  # your agent here (this takes random actions)
 
     # frames.append(Image.fromarray(observation[-1]))
-    path = '../output/'
+    # path = '../output/'
     #
-    img = Image.fromarray(observation[:, :, -1])
-    img.save(path + str(env.current_step) + '.png')
+    # img = Image.fromarray(observation[:, :, -1])
+    # img.save(path + str(env.current_step) + '.png')
 
     # env.plot_renko(path=path)
 
     start = time.time()
     observation, reward, done, info = env.step(action)
-    print(len(observation), observation.shape)
+    # print(len(observation), observation.shape)
     end = time.time()
 
     time_obs.append(end - start)

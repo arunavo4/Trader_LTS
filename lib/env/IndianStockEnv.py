@@ -35,6 +35,7 @@ def setup_logger(name, log_file, level=logging.INFO):
     return logger
 
 
+# ***** Zerodha Brokerage *****
 # Func to calculate brokerage
 def cal_profit_w_brokerage(buy_price, sell_price, qty):
     turnover = (buy_price * qty) + (sell_price * qty)
@@ -61,7 +62,7 @@ class IndianStockEnv(gym.Env):
 
         self.initial_balance = config["initial_balance"]
 
-        self.exchange = StaticExchange()
+        self.exchange = StaticExchange(config=config)
 
         self.enable_logging = config['enable_env_logging']
         if self.enable_logging:

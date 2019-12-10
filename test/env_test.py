@@ -16,6 +16,7 @@ env_config = {
     "observation_window": 84,
     "frame_stack_size": 4,
     "use_leverage": False,
+    "market": 'us_mkt',
 }
 
 env = IndianStockEnv(env_config)

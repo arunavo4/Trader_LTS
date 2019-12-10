@@ -43,6 +43,7 @@ if __name__ == "__main__":
                 "observation_window": 84,
                 "frame_stack_size": 4,
                 "use_leverage": False,
+                "market": 'in_mkt',
             },
         },
     )

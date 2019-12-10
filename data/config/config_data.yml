@@ -1,0 +1,8 @@
+DataAPIToken: f6deea4df3f704452993854b3d30e3ac4af6560b
+DataAPIDataType: intraday
+DataAPIFetchMethod: async
+DataAPIFreq: 1min
+DataAPIStartDate: 2017-01-01
+DataAPIEndDate: 2019-06-01
+DataAPINumberOfObsPerDay: 391
+

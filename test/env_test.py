@@ -59,7 +59,7 @@ while True:
     # print("###############################")
 
     if done:
-        observation = env.reset()
+        # observation = env.reset()
         break
 env.close()
 

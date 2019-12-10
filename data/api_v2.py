@@ -1,7 +1,6 @@
 """
-    # This version of the Api helper functions lead to too many requests on the api
+    # This version of the Api helper func is Optimized for lower number of requests along with data validation checks.
 """
-
 
 import sys
 import pandas as pd

@@ -60,7 +60,7 @@ class CryptoPairEnv(gym.Env):
 
         self.initial_balance = config["initial_balance"]
 
-        self.exchange = StaticExchange()
+        self.exchange = StaticExchange(config=config)
 
         self.enable_logging = config['enable_env_logging']
         if self.enable_logging:

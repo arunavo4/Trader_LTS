@@ -5,21 +5,24 @@ import cv2
 import gym
 import time
 from statistics import mean
-from lib.env.IndianStockEnv import IndianStockEnv
+from lib.env.USStockEnv import USStockEnv
 import pandas as pd
 import numpy as np
+
+# Indian 375 * 10
+# US 390 * 10
 
 env_config = {
     "initial_balance": 10000,
     "enable_env_logging": True,
-    "look_back_window_size": 375 * 10,
+    "look_back_window_size": 390 * 10,
     "observation_window": 84,
     "frame_stack_size": 4,
     "use_leverage": False,
     "market": 'us_mkt',
 }
 
-env = IndianStockEnv(env_config)
+env = USStockEnv(env_config)
 
 observation = env.reset()
 

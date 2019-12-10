@@ -10,7 +10,7 @@ from ray.rllib.models.tf.visionnet_v2 import VisionNetwork
 from ray.rllib.utils import try_import_tf
 from ray.tune import grid_search
 
-from lib.env.IndianStockEnv import IndianStockEnv
+from lib.env.USStockEnv import USStockEnv
 
 tf = try_import_tf()
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
             "timesteps_total": 10000000,
         },
         config={
-            "env": IndianStockEnv,  # or "corridor" if registered above
+            "env": USStockEnv,  # or "corridor" if registered above
             "model": {
                 "custom_model": "my_model",
             },
@@ -39,11 +39,11 @@ if __name__ == "__main__":
             "env_config": {
                 "initial_balance": 10000,
                 "enable_env_logging": False,
-                "look_back_window_size": 375 * 10,
+                "look_back_window_size": 390 * 10,  # Indian 375 * 10 | US 390 * 10
                 "observation_window": 84,
                 "frame_stack_size": 4,
                 "use_leverage": False,
-                "market": 'in_mkt',
+                "market": 'us_mkt',
             },
         },
     )

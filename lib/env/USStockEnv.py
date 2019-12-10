@@ -61,7 +61,7 @@ class USStockEnv(gym.Env):
 
         self.initial_balance = config["initial_balance"]
 
-        self.exchange = StaticExchange()
+        self.exchange = StaticExchange(config=config)
 
         self.enable_logging = config['enable_env_logging']
         if self.enable_logging:
@@ -328,7 +328,7 @@ class USStockEnv(gym.Env):
         self.action_record = ""
         # set next time
         self.t = self._current_index()
-        if (self.t + 10) % 375 == 0:
+        if (self.t + 10) % 390 == 0:
             # auto square-off at 3:20 pm and skip to next day
             # Check of trades taken
             self.tradable = False
@@ -476,13 +476,13 @@ class USStockEnv(gym.Env):
                     self.logger.info(self.position_record)
                     self.logger.info(message)
 
-        if (self.t + 10) % 375 == 0:
+        if (self.t + 10) % 390 == 0:
             # close Market at 3:20 pm and skip to next day
             if self.enable_logging:
                 self.logger.info("{} Market Closed".format(self._current_timestamp()))
             self.market_open = False
 
-        if (self.t + 1) % 375 == 0:
+        if (self.t + 1) % 390 == 0:
             self.market_open = True
             self.tradable = True
             # Log for the day
@@ -490,7 +490,7 @@ class USStockEnv(gym.Env):
                 self.logger.info(
                     "{}: {} Net_worth: {} Total Profits: {} Total Profit_Per: {}".format(
                         self._current_timestamp(),
-                        ((self.t + 1) % 375),
+                        ((self.t + 1) % 390),
                         round(self.net_worth[0], 2),
                         round(self.profits, 2),
                         round(self.profit_per, 3), ))
@@ -512,7 +512,7 @@ class USStockEnv(gym.Env):
                 self.logger.info(
                     "{}: {} Balance: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
                         self._current_timestamp(),
-                        ((self.t + 1) % 375),
+                        ((self.t + 1) % 390),
                         round(self.balance, 2),
                         round(self.net_worth[0], 2),
                         round(self.qty),
@@ -546,10 +546,10 @@ class USStockEnv(gym.Env):
         self.balance = self.initial_balance
         self.frames.clear()
 
-        if int(self.look_back_window_size / 375) > 1:
-            self.current_step = int(375) * int(self.look_back_window_size / 375)
+        if int(self.look_back_window_size / 390) > 1:
+            self.current_step = int(390) * int(self.look_back_window_size / 390)
         else:
-            self.current_step = int(375)
+            self.current_step = int(390)
 
         self.exchange.reset()
 

@@ -5,23 +5,19 @@
 from ray import tune
 from ray.rllib.agents.dqn import DQNTrainer
 from ray.rllib.models import ModelCatalog
-from ray.rllib.agents.dqn.distributional_q_model import DistributionalQModel
-from ray.rllib.models.tf.visionnet_v1 import _get_filter_config
-from ray.rllib.models.tf.misc import normc_initializer, get_activation_fn
 from ray.rllib.utils import try_import_tf
 
-from lib.env.IndianStockEnv import IndianStockEnv
+from lib.env.USStockEnv import USStockEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
-
 
 ModelCatalog.register_custom_model("NatureCNN", VisionNetwork)
 
 tune.run(DQNTrainer,
          checkpoint_freq=10,  # iterations
          checkpoint_at_end=True,
-         config={"env": IndianStockEnv,
+         config={"env": USStockEnv,
                  "model": {
                      "custom_model": "NatureCNN"
                  },
@@ -49,10 +45,10 @@ tune.run(DQNTrainer,
                  "env_config": {
                      "initial_balance": 10000,
                      "enable_env_logging": False,
-                     "look_back_window_size": 375 * 10,
+                     "look_back_window_size": 390 * 10,  # Indian 375 * 10 | US 390 * 10
                      "observation_window": 84,
                      "frame_stack_size": 4,
                      "use_leverage": False,
-                     "market": 'in_mkt',
+                     "market": 'us_mkt',
                  },
                  })  # "eager": True for eager execution

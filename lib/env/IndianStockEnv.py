@@ -79,7 +79,7 @@ class IndianStockEnv(gym.Env):
         self.use_leverage = config['use_leverage']
 
         if self.use_leverage:
-            self.leverage = 15
+            self.leverage = 1   # Currently disabled
 
         # Stuff from the Env Before
         self.decay_rate = 1e-2
@@ -275,16 +275,18 @@ class IndianStockEnv(gym.Env):
             new_renko_bars = self.do_next(pd.Series([observations['close']]))
             if new_renko_bars == 0 and self.market_open:
                 if self.current_step + 1 <= len(self.exchange.data_frame) - 1:
-                    self.current_step += 1
                     # Automatically perform hold
-                    self._is_auto_hold = True
-                    self._take_action(action=0)
-                    self._is_auto_hold = False
                     if self.enable_logging:
                         self.logger.info(
                             "{} Auto Hold : Renko_bars: {} : Brick_size: {}".format(self._current_timestamp(),
                                                                                     new_renko_bars,
                                                                                     self.brick_size))
+
+                    self._is_auto_hold = True
+                    self._take_action(action=0)
+                    self._is_auto_hold = False
+                    self.current_step += 1
+
                 else:
                     self.done = True
                     break

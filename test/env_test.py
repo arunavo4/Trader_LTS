@@ -5,7 +5,7 @@ import cv2
 import gym
 import time
 from statistics import mean
-from lib.env.TraderRenkoEnv_v3_lite import StockTradingEnv
+from lib.env.IndianStockEnv import IndianStockEnv
 import pandas as pd
 import numpy as np
 
@@ -18,11 +18,11 @@ env_config = {
     "use_leverage": False,
 }
 
-env = StockTradingEnv(env_config)
+env = IndianStockEnv(env_config)
 
 observation = env.reset()
 
-max_env_steps = 1000
+max_env_steps = 0
 
 time_obs = []
 
@@ -44,7 +44,7 @@ while True:
     observation, reward, done, info = env.step(action)
     # print(len(observation), observation.shape)
     end = time.time()
-
+    max_env_steps += 1
     time_obs.append(end - start)
 
     # print("###############################")

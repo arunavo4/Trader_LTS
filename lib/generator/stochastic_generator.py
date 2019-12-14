@@ -69,17 +69,17 @@ def get_model_params(param_type, base_price, t_gen, delta):
 
 def get_delta(time_frame):
     if time_frame == "1sec":
-        delta = 1 / (252 * 24 * 60 * 60)
+        return 1 / (252 * 24 * 60 * 60)
     elif time_frame == "1min":
-        delta = 1 / (252 * 24 * 60)
+        return 1 / (252 * 24 * 60)
     elif time_frame == "15min":
-        delta = 1 / (252 * 24 * 4)
+        return 1 / (252 * 24 * 4)
     elif time_frame == "hourly":
-        delta = 1 / (252 * 24)
+        return 1 / (252 * 24)
     elif time_frame == "daily":
-        delta = 1 / 252
+        return 1 / 252
     elif time_frame == "monthly":
-        delta = 1 / 12
+        return 1 / 12
 
 
 class STOCHExchange:

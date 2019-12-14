@@ -1,6 +1,7 @@
 """
-    # This version of the Api helper func is Optimized for lower number of requests along with data validation checks.
+    # This version of the Api helper functions lead to too many requests on the api
 """
+
 
 import sys
 import pandas as pd
@@ -24,9 +25,9 @@ class Tiingo(object):
 
         if (data_type == 'intraday') or (data_type == 'daily'):
             if self.config['DataAPIFetchMethod'] == 'async':
-                return self._fetch_hist_async(ticker_list, attr)
+                return self._fetch_hist_async(ticker_list)
             else:
-                return self._fetch_hist(ticker_list, attr)
+                return self._fetch_hist(ticker_list)
 
     def _fetch_realtime(self, ticker_list, attr):
         token = self.config['DataAPIToken']
@@ -35,22 +36,28 @@ class Tiingo(object):
         output = self.fetch_data(para)[attr]
         return output
 
-    def _fetch_hist_async(self, ticker_list, attr):
+    def _fetch_hist_async(self, ticker_list):
         output = dict()
-        paras = self._get_para(ticker_list)
-        loop = AsyncIO.create_loop()
-        tasks = AsyncIO.create_tasks(loop, paras, self.fetch_data_async)
-        results = loop.run_until_complete(tasks)
-        loop.close()
-        for result in results:
-            data, ticker = result.result()
-            if len(data) != 0:
-                data = self.format_data(data, attr, self.config['DataAPINumberOfObsPerDay'])
-            output[ticker] = data
-
+        for ticker in ticker_list:
+            try:
+                df = pd.DataFrame()
+                paras = self._get_para(ticker)
+                loop = AsyncIO.create_loop()
+                tasks = AsyncIO.create_tasks(loop, paras, self.fetch_data_async)
+                results = loop.run_until_complete(tasks)
+                loop.close()
+                for result in results:
+                    data = result.result()
+                    if len(data) != 0:
+                        data = self.format_data(data, self.config['DataAPINumberOfObsPerDay'])
+                        df = pd.concat([df, data])
+                df.reset_index(drop=True, inplace=True)
+                output[ticker] = df
+            except TypeError:
+                print("TypeError Exception with: ", ticker)
         return output
 
-    def _fetch_hist(self, ticker_list, attr):
+    def _fetch_hist(self, ticker_list):
         output = dict()
         for ticker in ticker_list:
             try:
@@ -59,7 +66,7 @@ class Tiingo(object):
                 outs = [self.fetch_data(para['url']) for para in paras]
                 for data in outs:
                     if len(data) != 0:
-                        data = self.format_data(data, attr, self.config['DataAPINumberOfObsPerDay'])
+                        data = self.format_data(data, self.config['DataAPINumberOfObsPerDay'])
                         df = pd.concat([df, data])
                 df.reset_index(drop=True, inplace=True)
                 output[ticker] = df
@@ -67,20 +74,20 @@ class Tiingo(object):
                 print("TypeError Exception with: ", ticker)
         return output
 
-    def _get_para(self, tickers):
+    def _get_para(self, ticker):
         config = self.config
         data_type = config['DataAPIDataType']
         token = config['DataAPIToken']
         freq = config['DataAPIFreq']
         start_date = config['DataAPIStartDate']
         end_date = config['DataAPIEndDate']
+        period = pd.date_range(start=start_date, end=end_date, freq='15D')
+        period_pairs = list(map(list, zip(period, period[1:])))
 
         if data_type == 'intraday':
-            paras = [{'url': self.get_url_intraday(ticker, start_date, end_date, freq, token), 'ticker': ticker} for
-                     ticker in tickers]
+            paras = [{'url': self.get_url_intraday(ticker, start, end, freq, token)} for start, end in period_pairs]
         elif data_type == 'daily':
-            paras = [{'url': self.get_url_daily(ticker, start_date, end_date, token), 'ticker': ticker} for ticker in
-                     tickers]
+            paras = [{'url': self.get_url_daily(ticker, start_date, end_date, token)}]
         else:
             raise ValueError('Error:Invalid data type.')
 
@@ -114,14 +121,14 @@ class Tiingo(object):
         return url
 
     @staticmethod
-    async def fetch_data_async(session, ticker, url):
+    async def fetch_data_async(session, url):
         async with session.get(url) as response:
             json = await response.json()
             try:
                 data = pd.DataFrame(json)
             except ValueError:
                 data = json
-            return data, ticker
+            return data
 
     @staticmethod
     def fetch_data(url):
@@ -129,9 +136,8 @@ class Tiingo(object):
         return data
 
     @staticmethod
-    def format_data(data, attr, n_obs):
-        n_obs = int(n_obs)
-        data = data[attr]
+    def format_data(data, n_obs):
+        # n_obs = int(n_obs)
         # if len(data) > n_obs:
         #     data = data.iloc[:n_obs]
         return data

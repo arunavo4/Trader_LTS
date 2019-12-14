@@ -136,7 +136,7 @@ class Tiingo(object):
     @staticmethod
     def format_data(data, attr, n_obs):
         n_obs = int(n_obs)
-        data = data[attr]
+        # data = data[attr]
         if len(data) > n_obs:
             data = data.iloc[:n_obs]
         return data

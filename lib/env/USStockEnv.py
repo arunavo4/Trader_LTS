@@ -86,7 +86,6 @@ class USStockEnv(gym.Env):
         self._is_auto_hold = False
         self.done = False
         self.current_step = int(375)
-        self.t = int(0)
         self.wins = int(0)
         self.losses = int(0)
         self.qty = int(0)
@@ -315,8 +314,14 @@ class USStockEnv(gym.Env):
     def _current_timestamp(self):
         return self.exchange.data_frame.index[self.current_step]
 
-    def _current_index(self):
-        return self.current_step
+    def _current_date(self):
+        return pd.to_datetime(self._current_timestamp()).date()
+
+    def _next_date(self):
+        return pd.to_datetime(self.exchange.data_frame.index[self.current_step+1]).date()
+
+    def _is_day_over(self):
+        return self._current_date() != self._next_date()
 
     def _take_action(self, action):
         current_price = self._current_price()
@@ -327,9 +332,8 @@ class USStockEnv(gym.Env):
         self.position_record = ""
         self.action_record = ""
         # set next time
-        self.t = self._current_index()
-        if (self.t + 10) % 390 == 0:
-            # auto square-off at 3:20 pm and skip to next day
+        if self._is_day_over():
+            # auto square-off and skip to next day
             # Check of trades taken
             self.tradable = False
             if len(self.positions) != 0:
@@ -476,21 +480,20 @@ class USStockEnv(gym.Env):
                     self.logger.info(self.position_record)
                     self.logger.info(message)
 
-        if (self.t + 10) % 390 == 0:
-            # close Market at 3:20 pm and skip to next day
+        if self._is_day_over():
+            # close Market and skip to next day
             if self.enable_logging:
                 self.logger.info("{} Market Closed".format(self._current_timestamp()))
             self.market_open = False
 
-        if (self.t + 1) % 390 == 0:
+        if self._is_day_over():
             self.market_open = True
             self.tradable = True
             # Log for the day
             if self.enable_logging:
                 self.logger.info(
-                    "{}: {} Net_worth: {} Total Profits: {} Total Profit_Per: {}".format(
+                    "{}: Net_worth: {} Total Profits: {} Total Profit_Per: {}".format(
                         self._current_timestamp(),
-                        ((self.t + 1) % 390),
                         round(self.net_worth[0], 2),
                         round(self.profits, 2),
                         round(self.profit_per, 3), ))
@@ -510,9 +513,8 @@ class USStockEnv(gym.Env):
         if self.market_open:
             if self.enable_logging and not self._is_auto_hold:
                 self.logger.info(
-                    "{}: {} Balance: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
+                    "{}: Balance: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
                         self._current_timestamp(),
-                        ((self.t + 1) % 390),
                         round(self.balance, 2),
                         round(self.net_worth[0], 2),
                         round(self.qty),
@@ -560,7 +562,6 @@ class USStockEnv(gym.Env):
         self.initial_step = self.current_step
         self._is_auto_hold = False
         self.done = False
-        self.t = int(0)
         self.wins = int(0)
         self.losses = int(0)
         self.short = False

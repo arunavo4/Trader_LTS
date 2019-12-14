@@ -1,14 +1,17 @@
 import time
 from lib.generator.static_generator import StaticExchange
 
+# Indian 375 * 10
+# US 390 * 10
+
 config = {
     "initial_balance": 10000,
     "enable_env_logging": False,
-    "look_back_window_size": 375 * 10,
+    "look_back_window_size": 390 * 10,
     "observation_window": 84,
     "frame_stack_size": 4,
     "use_leverage": False,
-    "market": 'in_mkt',
+    "market": 'us_mkt',
 }
 
 ex = StaticExchange(config)

@@ -3,7 +3,7 @@
     This version of the Env has specific Enhancements for Crypto Pair Trading
 
     ############################################################
-                This is a Work in Progress.
+                This is a Work in Progress. -- FUTURE PLAN
     ############################################################
     ***** This is the most Optimized version till date *****
 """

@@ -62,6 +62,10 @@ class IndianStockEnv(gym.Env):
 
         self.initial_balance = config["initial_balance"]
 
+        # Some Market_specific config
+        config['look_back_window_size'] *= 375
+        config['market'] = 'in_mkt'
+
         self.exchange = StaticExchange(config=config)
 
         self.enable_logging = config['enable_env_logging']
@@ -316,8 +320,14 @@ class IndianStockEnv(gym.Env):
     def _current_timestamp(self):
         return self.exchange.data_frame.index[self.current_step]
 
-    def _current_index(self):
-        return self.current_step
+    def _current_date(self):
+        return pd.to_datetime(self._current_timestamp()).date()
+
+    def _next_date(self):
+        return pd.to_datetime(self.exchange.data_frame.index[self.current_step+1]).date()
+
+    def _is_day_over(self):
+        return self._current_date() != self._next_date()
 
     def _take_action(self, action):
         current_price = self._current_price()
@@ -328,8 +338,7 @@ class IndianStockEnv(gym.Env):
         self.position_record = ""
         self.action_record = ""
         # set next time
-        self.t = self._current_index()
-        if (self.t + 10) % 375 == 0:
+        if self._is_day_over():
             # auto square-off at 3:20 pm and skip to next day
             # Check of trades taken
             self.tradable = False
@@ -477,13 +486,13 @@ class IndianStockEnv(gym.Env):
                     self.logger.info(self.position_record)
                     self.logger.info(message)
 
-        if (self.t + 10) % 375 == 0:
+        if self._is_day_over():
             # close Market at 3:20 pm and skip to next day
             if self.enable_logging:
                 self.logger.info("{} Market Closed".format(self._current_timestamp()))
             self.market_open = False
 
-        if (self.t + 1) % 375 == 0:
+        if self._is_day_over():
             self.market_open = True
             self.tradable = True
             # Log for the day
@@ -496,7 +505,6 @@ class IndianStockEnv(gym.Env):
                         round(self.profits, 2),
                         round(self.profit_per, 3), ))
 
-            # reward += self.profit_per * 10  # Bonus for making a profit at the end of the day
             self.daily_profit_per.append(round(self.profit_per, 3))
             self.profit_per = 0.0
             # Reset Profits for the day
@@ -511,9 +519,8 @@ class IndianStockEnv(gym.Env):
         if self.market_open:
             if self.enable_logging and not self._is_auto_hold:
                 self.logger.info(
-                    "{}: {} Balance: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
+                    "{}: Balance: {} Net_worth: {} Stk_Qty: {} Pos_Val: {} Profits: {} Profit_Per: {}".format(
                         self._current_timestamp(),
-                        ((self.t + 1) % 375),
                         round(self.balance, 2),
                         round(self.net_worth[0], 2),
                         round(self.qty),

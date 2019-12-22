@@ -20,6 +20,7 @@ from ray.rllib.policy.sample_batch import DEFAULT_POLICY_ID
 from ray.rllib.utils import try_import_tf
 from ray.tune.util import merge_dicts
 
+from lib.env.USStockEnv import USStockEnv
 from lib.env.IndianStockEnv import IndianStockEnv
 from lib.model.vision_network import VisionNetwork
 
@@ -161,7 +162,7 @@ def rollout(agent, env_name, num_steps, out=None, no_render=True):
             rollouts.append(rollout)
         print("\n============ Stats ================")
         print("Episode reward:", reward_total)
-        print("Final Amount:", env.amt)
+        print("Final Amount:", env.net_worth[0])
         print("Avg Daily Profit:", round(mean(env.daily_profit_per), 3))
         print("Days in Episode:", len(env.daily_profit_per))
         print("Wins:", env.wins, "Losses:", env.losses)
@@ -173,22 +174,21 @@ def rollout(agent, env_name, num_steps, out=None, no_render=True):
 
 if __name__ == "__main__":
     args = {
-        'checkpoint_dir': '/home/skywalker/ray_results/IMPALA/IMPALA_StockTradingEnv_0_2019-12-01_16-39-18eykevn_g'
-                          '/checkpoint_1720',
-        'checkpoint_path': '/home/skywalker/ray_results/IMPALA/IMPALA_StockTradingEnv_0_2019-12-01_16-39-18eykevn_g'
-                           '/checkpoint_1720/checkpoint-1720',
+        'checkpoint_dir': '/home/skywalker/ray_results/IMPALA/IMPALA_USStockEnv_0_2019-12-14_19-54-04szxu911z'
+                          '/checkpoint_600',
+        'checkpoint_path': '/home/skywalker/ray_results/IMPALA/IMPALA_USStockEnv_0_2019-12-14_19-54-04szxu911z'
+                           '/checkpoint_600/checkpoint-600',
         'config': {"env_config": {
             "initial_balance": 10000,
             "enable_env_logging": True,
-            "look_back_window_size": 375 * 10,
+            "look_back_window_size": 10,
             "observation_window": 84,
             "frame_stack_size": 4,
             "use_leverage": False,
-            "market": 'in_mkt',
         }},
-        'env': IndianStockEnv,
+        'env': USStockEnv,
         'run': "IMPALA",
-        'steps': 5000,
+        'steps': 10000,
         'out': None,
         'no_render': True
     }

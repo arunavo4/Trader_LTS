@@ -15,10 +15,6 @@ from lib.env.USStockEnv import USStockEnv
 tf = try_import_tf()
 
 if __name__ == "__main__":
-    ray.init(memory=20000000000,
-             object_store_memory=10000000000,
-             redis_max_memory=5000000000,
-             driver_object_store_memory=2000000000)
     ModelCatalog.register_custom_model("my_model", VisionNetwork)
     tune.run(
         PPOTrainer,
@@ -39,11 +35,10 @@ if __name__ == "__main__":
             "env_config": {
                 "initial_balance": 10000,
                 "enable_env_logging": False,
-                "look_back_window_size": 390 * 10,  # Indian 375 * 10 | US 390 * 10
+                "look_back_window_size": 10,
                 "observation_window": 84,
                 "frame_stack_size": 4,
                 "use_leverage": False,
-                "market": 'us_mkt',
             },
         },
     )

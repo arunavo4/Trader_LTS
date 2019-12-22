@@ -2,6 +2,12 @@
     ****** US Version of the Stock Trader ******
     This version of the Env has specific Enhancements for Intra-day Trading
     ***** This is the most Optimized version till date *****
+
+    ****** Important Reward Change ******
+    Moving to Simple Reward Scheme of +1 / -1.
+    This will standardize the whole Environment Experiments
+    across the different Algorithms.
+
 """
 
 # logging
@@ -52,7 +58,7 @@ np.warnings.filterwarnings('ignore')
 
 
 class USStockEnv(gym.Env):
-    """A Stock trading environment for Indian Stock Market"""
+    """A Stock trading environment for US Stock Market"""
     metadata = {'render.modes': ['human', 'system', 'none']}
     viewer = None
 
@@ -60,6 +66,10 @@ class USStockEnv(gym.Env):
         super(USStockEnv, self).__init__()
 
         self.initial_balance = config["initial_balance"]
+
+        # Some Market_specific config
+        config['look_back_window_size'] *= 390
+        config['market'] = 'us_mkt'
 
         self.exchange = StaticExchange(config=config)
 
@@ -408,7 +418,7 @@ class USStockEnv(gym.Env):
                 profit_per_stock = profits / self.qty
                 profit_percent = (profit_per_stock / mean(self.positions)) * 100
 
-                reward += self.get_reward(profit_percent) * 0.01  # 1/100 of the real profit
+                # reward += self.get_reward(profit_percent) * 0.01  # 1/100 of the real profit
 
                 message = "{}: Action: {} ; Reward: {}".format(self._current_timestamp(), "Hold",
                                                                round(reward, 3))
@@ -498,7 +508,6 @@ class USStockEnv(gym.Env):
                         round(self.profits, 2),
                         round(self.profit_per, 3), ))
 
-            # reward += self.profit_per * 10  # Bonus for making a profit at the end of the day
             self.daily_profit_per.append(round(self.profit_per, 3))
             self.profit_per = 0.0
             # Reset Profits for the day
@@ -522,8 +531,8 @@ class USStockEnv(gym.Env):
                         round(self.profits, 2),
                         round(self.profit_per, 3), ))
 
-        # clip reward
-        reward = round(reward, 4)
+        # clip reward {-1 , 1}
+        reward = np.sign(reward)
 
         return reward
 

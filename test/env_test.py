@@ -18,6 +18,7 @@ env_config = {
     "observation_window": 84,
     "frame_stack_size": 4,
     "use_leverage": False,
+    "hold_reward": False,
 }
 
 env = IndianStockEnv(env_config)

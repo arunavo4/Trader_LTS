@@ -6,8 +6,7 @@ import gym
 import time
 from statistics import mean
 from lib.env.USStockEnv import USStockEnv
-import pandas as pd
-import numpy as np
+from lib.env.IndianStockEnv import IndianStockEnv
 
 # Indian 375 * 10
 # US 390 * 10
@@ -21,7 +20,7 @@ env_config = {
     "use_leverage": False,
 }
 
-env = USStockEnv(env_config)
+env = IndianStockEnv(env_config)
 
 observation = env.reset()
 

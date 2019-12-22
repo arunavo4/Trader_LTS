@@ -53,5 +53,6 @@ tune.run(ApexTrainer,
                      "observation_window": 84,
                      "frame_stack_size": 4,
                      "use_leverage": False,
+                     "hold_reward": False,
                  },
                  })  # "eager": True for eager execution

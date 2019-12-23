@@ -18,6 +18,6 @@ end = time.time()
 
 
 print("Time: ", end-start)
-
+print(ex.data_frame.shape)
 print(ex.data_frame.head())
 print(ex.data_frame.tail())

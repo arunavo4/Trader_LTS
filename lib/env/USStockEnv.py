@@ -68,7 +68,6 @@ class USStockEnv(gym.Env):
         self.initial_balance = config["initial_balance"]
 
         # Some Market_specific config
-        config['look_back_window_size'] *= 390
         config['market'] = 'us_mkt'
 
         self.exchange = StaticExchange(config=config)
@@ -96,7 +95,7 @@ class USStockEnv(gym.Env):
         self.decay_rate = 1e-2
         self._is_auto_hold = False
         self.done = False
-        self.current_step = int(390)
+        self._current_step = int(390)
         self.wins = int(0)
         self.losses = int(0)
         self.qty = int(0)
@@ -114,13 +113,18 @@ class USStockEnv(gym.Env):
         self.position_record = ""
         self.rewards = deque(np.zeros(1, dtype=float))
         self.net_worth = deque([self.initial_balance], maxlen=1)
-        self.initial_step = self.current_step
+        self.initial_step = self._current_step
         self.sum = 0.0
         self.denominator = np.exp(-1 * self.decay_rate)
 
         self.look_back_window_size = config['look_back_window_size'] or 390 * 10
         self.obs_window = config['observation_window'] or 84
         self.hold_reward = config['hold_reward']
+
+        if int(self.look_back_window_size / 390) > 1:
+            self._current_step = int(390) * int(self.look_back_window_size / 390)
+        else:
+            self._current_step = int(390)
 
         # Frame Stack
         self.stack_size = config['frame_stack_size'] or 4
@@ -282,10 +286,10 @@ class USStockEnv(gym.Env):
 
     def _next_observation(self):
         while True:
-            observations = self.exchange.data_frame.iloc[self.current_step]
+            observations = self.exchange.data_frame.iloc[self._current_step]
             new_renko_bars = self.do_next(pd.Series([observations['close']]))
             if new_renko_bars == 0 and self.market_open:
-                if self.current_step + 1 <= len(self.exchange.data_frame) - 1:
+                if self._current_step + 1 <= len(self.exchange.data_frame) - 1:
                     # Automatically perform hold
                     if self.enable_logging:
                         self.logger.info(
@@ -295,7 +299,7 @@ class USStockEnv(gym.Env):
                     self._is_auto_hold = True
                     self._take_action(action=0)
                     self._is_auto_hold = False
-                    self.current_step += 1
+                    self._current_step += 1
 
                 else:
                     self.done = True
@@ -320,16 +324,16 @@ class USStockEnv(gym.Env):
         return obs
 
     def _current_price(self):
-        return self.exchange.data_frame['close'].values[self.current_step]
+        return self.exchange.data_frame['close'].values[self._current_step]
 
     def _current_timestamp(self):
-        return self.exchange.data_frame.index[self.current_step]
+        return self.exchange.data_frame.index[self._current_step]
 
     def _current_date(self):
         return pd.to_datetime(self._current_timestamp()).date()
 
     def _next_date(self):
-        return pd.to_datetime(self.exchange.data_frame.index[self.current_step+1]).date()
+        return pd.to_datetime(self.exchange.data_frame.index[self._current_step+1]).date()
 
     def _is_day_over(self):
         return self._current_date() != self._next_date()
@@ -530,7 +534,7 @@ class USStockEnv(gym.Env):
                         round(self.qty),
                         round(self.position_value, 2),
                         round(self.profits, 2),
-                        round(self.profit_per, 3), ))
+                        round(self.profit_per, 3)))
 
         # clip reward
         reward = round(self.clip_reward(reward), 3)
@@ -541,18 +545,18 @@ class USStockEnv(gym.Env):
         return reward / self.brick_size_per
 
     def _done(self):
-        self.done = self.net_worth[0] < self.initial_balance / 2 or self.current_step == len(
+        self.done = self.net_worth[0] < self.initial_balance / 2 or self._current_step == len(
             self.exchange.data_frame) - 1
         return self.done
 
     def _set_history(self):
-        current_idx = self.current_step
+        current_idx = self._current_step
         past_data = self.exchange.data_frame[-self.look_back_window_size + current_idx:current_idx]
 
         self.build_history(past_data['close'])
 
     def _set_optimal_box_size(self):
-        current_idx = self.current_step
+        current_idx = self._current_step
         past_data = self.exchange.data_frame[-self.look_back_window_size + current_idx:current_idx]
 
         self.set_brick_size(auto=False, brick_size=get_optimal_box_size(past_data))
@@ -569,9 +573,9 @@ class USStockEnv(gym.Env):
         self.frames.clear()
 
         if int(self.look_back_window_size / 390) > 1:
-            self.current_step = int(390) * int(self.look_back_window_size / 390)
+            self._current_step = int(390) * int(self.look_back_window_size / 390)
         else:
-            self.current_step = int(390)
+            self._current_step = int(390)
 
         self.exchange.reset()
 
@@ -579,7 +583,7 @@ class USStockEnv(gym.Env):
         self._set_history()
 
         self.net_worth.clear()
-        self.initial_step = self.current_step
+        self.initial_step = self._current_step
         self._is_auto_hold = False
         self.done = False
         self.wins = int(0)
@@ -609,7 +613,7 @@ class USStockEnv(gym.Env):
     def step(self, action):
         reward = self._take_action(action)
 
-        self.current_step += 1
+        self._current_step += 1
 
         obs = self._next_observation()
         self._done()

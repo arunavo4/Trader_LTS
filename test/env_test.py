@@ -21,7 +21,7 @@ env_config = {
     "hold_reward": False,
 }
 
-env = IndianStockEnv(env_config)
+env = USStockEnv(env_config)
 
 observation = env.reset()
 
@@ -34,6 +34,7 @@ frames = []
 while True:
     # env.render()
     action = env.action_space.sample()  # your agent here (this takes random actions)
+    action = 0
 
     # frames.append(Image.fromarray(observation[-1]))
     # path = '../output/'

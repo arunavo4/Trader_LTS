@@ -63,7 +63,6 @@ class IndianStockEnv(gym.Env):
         self.initial_balance = config["initial_balance"]
 
         # Some Market_specific config
-        config['look_back_window_size'] *= 375
         config['market'] = 'in_mkt'
 
         self.exchange = StaticExchange(config=config)
@@ -117,6 +116,11 @@ class IndianStockEnv(gym.Env):
         self.look_back_window_size = config['look_back_window_size'] or 375 * 10
         self.obs_window = config['observation_window'] or 84
         self.hold_reward = config['hold_reward']
+
+        if int(self.look_back_window_size / 375) > 1:
+            self.current_step = int(375) * int(self.look_back_window_size / 375)
+        else:
+            self.current_step = int(375)
 
         # Frame Stack
         self.stack_size = config['frame_stack_size'] or 4
@@ -527,7 +531,7 @@ class IndianStockEnv(gym.Env):
                         round(self.qty),
                         round(self.position_value, 2),
                         round(self.profits, 2),
-                        round(self.profit_per, 3), ))
+                        round(self.profit_per, 3)))
 
         # clip reward
         reward = round(self.clip_reward(reward), 3)

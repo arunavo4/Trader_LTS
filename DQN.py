@@ -53,7 +53,7 @@ tune.run(DQNTrainer,
                  "env_config": {
                      "initial_balance": 10000,
                      "enable_env_logging": False,
-                     "look_back_window_size": 10,
+                     "look_back_window_size": 390 * 10,  # US 390 * 10 | 375 * 10
                      "observation_window": 84,
                      "frame_stack_size": 4,
                      "use_leverage": False,

@@ -393,7 +393,9 @@ class USStockEnv(gym.Env):
                 else:
                     self.losses += 1
                 self.profit_per += round(profit_percent, 3)
-                reward += self.get_reward(profit_percent)
+                # TODO: Changing from profit_percent to actual_profit
+                # reward += self.get_reward(profit_percent)
+                reward += self.get_reward(profits)
 
                 # Save the record of exit
                 self.position_record = "{}: Qty : {} ; Avg: {} ; Ltp: {} ; P&L: {} ; %Chg: {}".format(
@@ -471,7 +473,9 @@ class USStockEnv(gym.Env):
                 else:
                     self.losses += 1
                 self.profit_per += round(profit_percent, 3)
-                reward += self.get_reward(profit_percent)
+                # TODO: Changing from profit_percent to actual_profit
+                # reward += self.get_reward(profit_percent)
+                reward += self.get_reward(profits)
 
                 # Save the record of exit
                 self.position_record = "{}: Qty : {} ; Avg: {} ; Ltp: {} ; P&L: {} ; %Chg: {}".format(
@@ -541,8 +545,9 @@ class USStockEnv(gym.Env):
 
         return reward
 
-    def clip_reward(self, reward):
-        return reward / self.brick_size_per
+    @staticmethod
+    def clip_reward(reward):
+        return reward / 10.0
 
     def _done(self):
         self.done = self.net_worth[0] < self.initial_balance / 2 or self._current_step == len(

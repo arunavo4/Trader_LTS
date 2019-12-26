@@ -174,14 +174,14 @@ def rollout(agent, env_name, num_steps, out=None, no_render=True):
 
 if __name__ == "__main__":
     args = {
-        'checkpoint_dir': '/home/skywalker/ray_results/IMPALA/IMPALA_USStockEnv_0_2019-12-14_19-54-04szxu911z'
-                          '/checkpoint_600',
-        'checkpoint_path': '/home/skywalker/ray_results/IMPALA/IMPALA_USStockEnv_0_2019-12-14_19-54-04szxu911z'
-                           '/checkpoint_600/checkpoint-600',
+        'checkpoint_dir': '/home/skywalker/ray_results/IMPALA/IMPALA_USStockEnv_0_2019-12-24_04-51-08ce8794fz'
+                          '/checkpoint_590',
+        'checkpoint_path': '/home/skywalker/ray_results/IMPALA/IMPALA_USStockEnv_0_2019-12-24_04-51-08ce8794fz'
+                           '/checkpoint_590/checkpoint-590',
         'config': {"env_config": {
             "initial_balance": 10000,
             "enable_env_logging": True,
-            "look_back_window_size": 10,
+            "look_back_window_size": 390 * 10,
             "observation_window": 84,
             "frame_stack_size": 4,
             "use_leverage": False,

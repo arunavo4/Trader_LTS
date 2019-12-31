@@ -11,7 +11,7 @@ from ray.rllib.agents.dqn.dqn import DQNTrainer
 from ray.rllib.models import ModelCatalog
 from ray.rllib.utils import try_import_tf
 
-from lib.env.USStockEnv import USStockEnv
+from lib.env.StockTraderEnv import StockTraderEnv
 from lib.model.vision_network import VisionNetwork
 
 tf = try_import_tf()
@@ -26,7 +26,7 @@ tune.run(DQNTrainer,
          max_failures=10,
          checkpoint_freq=10,  # iterations
          checkpoint_at_end=True,
-         config={"env": USStockEnv,
+         config={"env": StockTraderEnv,
                  "num_atoms": 51,
                  "noisy": True,
                  "gamma": 0.99,
@@ -52,12 +52,14 @@ tune.run(DQNTrainer,
                  },
                  "env_config": {
                      "initial_balance": 10000,
+                     "day_step_size": 375,  # IN 375 | US 390
+                     "look_back_window_size": 375 * 10,  # US 390 * 10 | 375 * 10
                      "enable_env_logging": False,
-                     "look_back_window_size": 390 * 10,  # US 390 * 10 | 375 * 10
                      "observation_window": 84,
                      "frame_stack_size": 4,
                      "use_leverage": False,
                      "hold_reward": False,
+                     "market": 'in_mkt',  # 'in_mkt' | 'us_mkt'
                  },
                  })  # "eager": True for eager execution
 # "num_workers": 4,

@@ -10,7 +10,7 @@ from ray.rllib.models.tf.visionnet_v2 import VisionNetwork
 from ray.rllib.utils import try_import_tf
 from ray.tune import grid_search
 
-from lib.env.USStockEnv import USStockEnv
+from lib.env.StockTraderEnv import StockTraderEnv
 
 tf = try_import_tf()
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
             "timesteps_total": 10000000,
         },
         config={
-            "env": USStockEnv,  # or "corridor" if registered above
+            "env": StockTraderEnv,  # or "corridor" if registered above
             "model": {
                 "custom_model": "my_model",
             },
@@ -34,12 +34,14 @@ if __name__ == "__main__":
             "num_gpus": 1,
             "env_config": {
                 "initial_balance": 10000,
+                "day_step_size": 375,  # IN 375 | US 390
+                "look_back_window_size": 375 * 10,  # US 390 * 10 | 375 * 10
                 "enable_env_logging": False,
-                "look_back_window_size": 390 * 10,  # US 390 * 10 | 375 * 10
                 "observation_window": 84,
                 "frame_stack_size": 4,
                 "use_leverage": False,
                 "hold_reward": False,
+                "market": 'in_mkt',  # 'in_mkt' | 'us_mkt'
             },
         },
     )

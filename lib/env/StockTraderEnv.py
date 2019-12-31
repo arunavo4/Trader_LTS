@@ -1,7 +1,7 @@
 """
-    ****** Indian Version of the Stock Trader ******
+    ****** Universal Version of the Stock Trader ******
     This version of the Env has specific Enhancements for Intra-day Trading
-    *** This is the most Optimized version till date
+    ***** This is the most Optimized version till date *****
 """
 
 # logging
@@ -35,7 +35,6 @@ def setup_logger(name, log_file, level=logging.INFO):
     return logger
 
 
-# ***** Zerodha Brokerage *****
 # Func to calculate brokerage
 def cal_profit_w_brokerage(buy_price, sell_price, qty):
     turnover = (buy_price * qty) + (sell_price * qty)
@@ -52,18 +51,15 @@ def cal_profit_w_brokerage(buy_price, sell_price, qty):
 np.warnings.filterwarnings('ignore')
 
 
-class IndianStockEnv(gym.Env):
-    """A Stock trading environment for Indian Stock Market"""
+class StockTraderEnv(gym.Env):
+    """A Stock trading environment for Stock Market"""
     metadata = {'render.modes': ['human', 'system', 'none']}
     viewer = None
 
     def __init__(self, config):
-        super(IndianStockEnv, self).__init__()
+        super(StockTraderEnv, self).__init__()
 
         self.initial_balance = config["initial_balance"]
-
-        # Some Market_specific config
-        config['market'] = 'in_mkt'
 
         self.exchange = StaticExchange(config=config)
 
@@ -90,8 +86,8 @@ class IndianStockEnv(gym.Env):
         self.decay_rate = 1e-2
         self._is_auto_hold = False
         self.done = False
-        self.current_step = int(375)
-        self.t = int(0)
+        self.day_step_size = config['day_step_size']
+        self._current_step = int(self.day_step_size)
         self.wins = int(0)
         self.losses = int(0)
         self.qty = int(0)
@@ -109,18 +105,18 @@ class IndianStockEnv(gym.Env):
         self.position_record = ""
         self.rewards = deque(np.zeros(1, dtype=float))
         self.net_worth = deque([self.initial_balance], maxlen=1)
-        self.initial_step = self.current_step
+        self.initial_step = self._current_step
         self.sum = 0.0
         self.denominator = np.exp(-1 * self.decay_rate)
 
-        self.look_back_window_size = config['look_back_window_size'] or 375 * 10
+        self.look_back_window_size = config['look_back_window_size'] or self.day_step_size * 10
         self.obs_window = config['observation_window'] or 84
         self.hold_reward = config['hold_reward']
 
-        if int(self.look_back_window_size / 375) > 1:
-            self.current_step = int(375) * int(self.look_back_window_size / 375)
+        if int(self.look_back_window_size / self.day_step_size) > 1:
+            self._current_step = int(self.day_step_size) * int(self.look_back_window_size / self.day_step_size)
         else:
-            self.current_step = int(375)
+            self._current_step = int(self.day_step_size)
 
         # Frame Stack
         self.stack_size = config['frame_stack_size'] or 4
@@ -282,10 +278,10 @@ class IndianStockEnv(gym.Env):
 
     def _next_observation(self):
         while True:
-            observations = self.exchange.data_frame.iloc[self.current_step]
+            observations = self.exchange.data_frame.iloc[self._current_step]
             new_renko_bars = self.do_next(pd.Series([observations['close']]))
             if new_renko_bars == 0 and self.market_open:
-                if self.current_step + 1 <= len(self.exchange.data_frame) - 1:
+                if self._current_step + 1 <= len(self.exchange.data_frame) - 1:
                     # Automatically perform hold
                     if self.enable_logging:
                         self.logger.info(
@@ -295,7 +291,7 @@ class IndianStockEnv(gym.Env):
                     self._is_auto_hold = True
                     self._take_action(action=0)
                     self._is_auto_hold = False
-                    self.current_step += 1
+                    self._current_step += 1
 
                 else:
                     self.done = True
@@ -320,16 +316,16 @@ class IndianStockEnv(gym.Env):
         return obs
 
     def _current_price(self):
-        return self.exchange.data_frame['close'].values[self.current_step]
+        return self.exchange.data_frame['close'].values[self._current_step]
 
     def _current_timestamp(self):
-        return self.exchange.data_frame.index[self.current_step]
+        return self.exchange.data_frame.index[self._current_step]
 
     def _current_date(self):
         return pd.to_datetime(self._current_timestamp()).date()
 
     def _next_date(self):
-        return pd.to_datetime(self.exchange.data_frame.index[self.current_step+1]).date()
+        return pd.to_datetime(self.exchange.data_frame.index[self._current_step+1]).date()
 
     def _is_day_over(self):
         return self._current_date() != self._next_date()
@@ -344,7 +340,7 @@ class IndianStockEnv(gym.Env):
         self.action_record = ""
         # set next time
         if self._is_day_over():
-            # auto square-off at 3:20 pm and skip to next day
+            # auto square-off and skip to next day
             # Check of trades taken
             self.tradable = False
             if len(self.positions) != 0:
@@ -496,7 +492,7 @@ class IndianStockEnv(gym.Env):
                     self.logger.info(message)
 
         if self._is_day_over():
-            # close Market at 3:20 pm and skip to next day
+            # close Market and skip to next day
             if self.enable_logging:
                 self.logger.info("{} Market Closed".format(self._current_timestamp()))
             self.market_open = False
@@ -507,9 +503,8 @@ class IndianStockEnv(gym.Env):
             # Log for the day
             if self.enable_logging:
                 self.logger.info(
-                    "{}: {} Net_worth: {} Total Profits: {} Total Profit_Per: {}".format(
+                    "{}: Net_worth: {} Total Profits: {} Total Profit_Per: {}".format(
                         self._current_timestamp(),
-                        ((self.t + 1) % 375),
                         round(self.net_worth[0], 2),
                         round(self.profits, 2),
                         round(self.profit_per, 3), ))
@@ -547,18 +542,18 @@ class IndianStockEnv(gym.Env):
         return reward / 10.0
 
     def _done(self):
-        self.done = self.net_worth[0] < self.initial_balance / 2 or self.current_step == len(
+        self.done = self.net_worth[0] < self.initial_balance / 2 or self._current_step == len(
             self.exchange.data_frame) - 1
         return self.done
 
     def _set_history(self):
-        current_idx = self.current_step
+        current_idx = self._current_step
         past_data = self.exchange.data_frame[-self.look_back_window_size + current_idx:current_idx]
 
         self.build_history(past_data['close'])
 
     def _set_optimal_box_size(self):
-        current_idx = self.current_step
+        current_idx = self._current_step
         past_data = self.exchange.data_frame[-self.look_back_window_size + current_idx:current_idx]
 
         self.set_brick_size(auto=False, brick_size=get_optimal_box_size(past_data))
@@ -574,10 +569,10 @@ class IndianStockEnv(gym.Env):
 
         self.frames.clear()
 
-        if int(self.look_back_window_size / 375) > 1:
-            self.current_step = int(375) * int(self.look_back_window_size / 375)
+        if int(self.look_back_window_size / self.day_step_size) > 1:
+            self._current_step = int(self.day_step_size) * int(self.look_back_window_size / self.day_step_size)
         else:
-            self.current_step = int(375)
+            self._current_step = int(self.day_step_size)
 
         self.exchange.reset()
 
@@ -585,10 +580,9 @@ class IndianStockEnv(gym.Env):
         self._set_history()
 
         self.net_worth.clear()
-        self.initial_step = self.current_step
+        self.initial_step = self._current_step
         self._is_auto_hold = False
         self.done = False
-        self.t = int(0)
         self.wins = int(0)
         self.losses = int(0)
         self.short = False
@@ -616,7 +610,7 @@ class IndianStockEnv(gym.Env):
     def step(self, action):
         reward = self._take_action(action)
 
-        self.current_step += 1
+        self._current_step += 1
 
         obs = self._next_observation()
         self._done()

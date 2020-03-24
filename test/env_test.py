@@ -5,7 +5,7 @@ import cv2
 import gym
 import time
 from statistics import mean
-from lib.env.StockTraderEnv import StockTraderEnv
+from lib.env.StockTraderEnv_v42 import StockTraderEnv
 
 # Indian 375 * 10
 # US 390 * 10
@@ -14,7 +14,7 @@ env_config = {
     "initial_balance": 10000,
     "day_step_size": 375,  # IN 375 | US 390
     "look_back_window_size": 375 * 10,  # US 390 * 10 | 375 * 10
-    "enable_env_logging": False,
+    "enable_env_logging": True,
     "observation_window": 84,
     "frame_stack_size": 4,
     "use_leverage": False,
@@ -35,7 +35,7 @@ frames = []
 while True:
     # env.render()
     action = env.action_space.sample()  # your agent here (this takes random actions)
-    action = 0
+    # action = 0
 
     # frames.append(Image.fromarray(observation[-1]))
     # path = '../output/'
